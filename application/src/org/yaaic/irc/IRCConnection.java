@@ -31,6 +31,7 @@ import org.jibble.pircbot.User;
 import org.yaaic.R;
 import org.yaaic.Yaaic;
 import org.yaaic.command.CommandParser;
+import org.yaaic.fish.Fish;
 import org.yaaic.model.Broadcast;
 import org.yaaic.model.Channel;
 import org.yaaic.model.Conversation;
@@ -390,6 +391,9 @@ public class IRCConnection extends PircBot
     @Override
     protected void onMessage(String target, String sender, String login, String hostname, String text)
     {
+        // Fish
+        text = Fish.decode(text, server.getTitle(), target);
+
         // Strip mIRC colors and formatting
         text = Colors.removeFormattingAndColors(text);
 
@@ -544,6 +548,9 @@ public class IRCConnection extends PircBot
     @Override
     protected void onPrivateMessage(String sender, String login, String hostname, String text)
     {
+        // Fish
+        text = Fish.decode(text, server.getTitle(), sender);
+
         // Strip mIRC colors and formatting
         text = Colors.removeFormattingAndColors(text);
 
