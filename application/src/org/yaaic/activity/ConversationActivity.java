@@ -683,12 +683,9 @@ public class ConversationActivity extends Activity implements ServiceConnection,
         switch (requestCode) {
             case REQUEST_CODE_SPEECH:
                 ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                StringBuffer buffer = new StringBuffer();
-                for (String partial : matches) {
-                    buffer.append(" ");
-                    buffer.append(partial);
+                if (matches.size() > 0) {
+                    ((EditText) findViewById(R.id.input)).setText(matches.get(0));
                 }
-                ((EditText) findViewById(R.id.input)).setText(buffer.toString().trim());
                 break;
             case REQUEST_CODE_JOIN:
                 joinChannelBuffer = data.getExtras().getString("channel");
