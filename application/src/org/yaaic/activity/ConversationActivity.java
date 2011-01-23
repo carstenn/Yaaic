@@ -70,8 +70,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnKeyListener;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -261,6 +261,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On service connected
      */
+    @Override
     public void onServiceConnected(ComponentName name, IBinder service)
     {
         this.binder = (IRCBinder) service;
@@ -275,6 +276,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On service disconnected
      */
+    @Override
     public void onServiceDisconnected(ComponentName name)
     {
         this.binder = null;
@@ -315,44 +317,44 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     public boolean onMenuItemSelected(int featureId, MenuItem item)
     {
         switch (item.getItemId()) {
-        case R.id.disconnect:
-            server.setStatus(Status.DISCONNECTED);
-            binder.getService().getConnection(serverId).quitServer();
-            server.clearConversations();
-            setResult(RESULT_OK);
-            finish();
-            break;
-        case R.id.close:
-            Conversation conversationToClose = deckAdapter.getItem(deck.getSelectedItemPosition());
-            // Make sure we part a channel when closing the channel conversation
-            if (conversationToClose.getType() == Conversation.TYPE_CHANNEL) {
-                binder.getService().getConnection(serverId).partChannel(conversationToClose.getName());
-            }
-            else if (conversationToClose.getType() == Conversation.TYPE_QUERY) {
-                server.removeConversation(conversationToClose.getName());
-                onRemoveConversation(conversationToClose.getName());
-            } else {
-                Toast.makeText(this, getResources().getString(R.string.close_server_window), Toast.LENGTH_SHORT).show();
-            }
-            break;
-        case R.id.join:
-            startActivityForResult(new Intent(this, JoinActivity.class), REQUEST_CODE_JOIN);
-            break;
-        case R.id.users:
-            Conversation conversationForUserList = deckAdapter.getItem(deck.getSelectedItemPosition());
-            if (conversationForUserList.getType() == Conversation.TYPE_CHANNEL) {
-                Intent intent = new Intent(this, UsersActivity.class);
-                intent.putExtra(
+            case R.id.disconnect:
+                server.setStatus(Status.DISCONNECTED);
+                binder.getService().getConnection(serverId).quitServer();
+                server.clearConversations();
+                setResult(RESULT_OK);
+                finish();
+                break;
+            case R.id.close:
+                Conversation conversationToClose = deckAdapter.getItem(deck.getSelectedItemPosition());
+                // Make sure we part a channel when closing the channel conversation
+                if (conversationToClose.getType() == Conversation.TYPE_CHANNEL) {
+                    binder.getService().getConnection(serverId).partChannel(conversationToClose.getName());
+                }
+                else if (conversationToClose.getType() == Conversation.TYPE_QUERY) {
+                    server.removeConversation(conversationToClose.getName());
+                    onRemoveConversation(conversationToClose.getName());
+                } else {
+                    Toast.makeText(this, getResources().getString(R.string.close_server_window), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.join:
+                startActivityForResult(new Intent(this, JoinActivity.class), REQUEST_CODE_JOIN);
+                break;
+            case R.id.users:
+                Conversation conversationForUserList = deckAdapter.getItem(deck.getSelectedItemPosition());
+                if (conversationForUserList.getType() == Conversation.TYPE_CHANNEL) {
+                    Intent intent = new Intent(this, UsersActivity.class);
+                    intent.putExtra(
                         Extra.USERS,
                         binder.getService().getConnection(server.getId()).getUsersAsStringArray(
-                                conversationForUserList.getName()
+                            conversationForUserList.getName()
                         )
-                );
-                startActivityForResult(intent, REQUEST_CODE_USERS);
-            } else {
-                Toast.makeText(this, getResources().getString(R.string.only_usable_from_channel), Toast.LENGTH_SHORT).show();
-            }
-            break;
+                    );
+                    startActivityForResult(intent, REQUEST_CODE_USERS);
+                } else {
+                    Toast.makeText(this, getResources().getString(R.string.only_usable_from_channel), Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
 
         return true;
@@ -371,6 +373,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On conversation message
      */
+    @Override
     public void onConversationMessage(String target)
     {
         Conversation conversation = server.getConversation(target);
@@ -401,6 +404,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On new conversation
      */
+    @Override
     public void onNewConversation(String target)
     {
         deckAdapter.addItem(server.getConversation(target));
@@ -414,6 +418,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On conversation remove
      */
+    @Override
     public void onRemoveConversation(String target)
     {
         deckAdapter.removeItem(target);
@@ -428,6 +433,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On server status update
      */
+    @Override
     public void onStatusUpdate()
     {
         ((ImageView) findViewById(R.id.status)).setImageResource(server.getStatusIcon());
@@ -450,9 +456,10 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                 builder.setMessage(getResources().getString(R.string.reconnect_after_disconnect, server.getTitle()))
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int id) {
                         binder.getService().getConnection(server.getId()).setAutojoinChannels(
-                                server.getCurrentChannelNames()
+                            server.getCurrentChannelNames()
                         );
                         server.clearConversations();
                         deckAdapter.clearConversations();
@@ -461,6 +468,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                     }
                 })
                 .setNegativeButton(getString(R.string.negative_button), new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -493,6 +501,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On key pressed (input line)
      */
+    @Override
     public boolean onKey(View view, int keyCode, KeyEvent event)
     {
         EditText input = (EditText) view;
@@ -572,7 +581,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
 
             if (conversationForUserList.getType() == Conversation.TYPE_CHANNEL) {
                 users = binder.getService().getConnection(server.getId()).getUsersAsStringArray(
-                        conversationForUserList.getName()
+                    conversationForUserList.getName()
                 );
             }
 
@@ -672,91 +681,91 @@ public class ConversationActivity extends Activity implements ServiceConnection,
         }
 
         switch (requestCode) {
-        case REQUEST_CODE_SPEECH:
-            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            StringBuffer buffer = new StringBuffer();
-            for (String partial : matches) {
-                buffer.append(" ");
-                buffer.append(partial);
-            }
-            ((EditText) findViewById(R.id.input)).setText(buffer.toString().trim());
-            break;
-        case REQUEST_CODE_JOIN:
-            joinChannelBuffer = data.getExtras().getString("channel");
-            break;
-        case REQUEST_CODE_USERS:
-            Intent intent = new Intent(this, UserActivity.class);
-            intent.putExtra(Extra.USER, data.getStringExtra(Extra.USER));
-            startActivityForResult(intent, REQUEST_CODE_USER);
-            break;
-        case REQUEST_CODE_NICK_COMPLETION:
-            EditText input = (EditText) findViewById(R.id.input);
-            String src        = data.getExtras().getString(Extra.USER);
-            int start        = input.getSelectionStart();
-            int end        = input.getSelectionEnd();
-
-            if (start == 0) {
-                src += ":";
-            }
-
-            src += " ";
-            input.getText().replace(start, end, src, 0, src.length());
-            // put cursor after inserted text
-            input.setSelection(start + src.length());
-            input.post(new Runnable() {
-                @Override
-                public void run() {
-                    // make the softkeyboard come up again (only if no hw keyboard is attached)
-                    EditText input = (EditText) findViewById(R.id.input);
-                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    mgr.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+            case REQUEST_CODE_SPEECH:
+                ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                StringBuffer buffer = new StringBuffer();
+                for (String partial : matches) {
+                    buffer.append(" ");
+                    buffer.append(partial);
                 }
-            });
-            input.requestFocus();
-            break;
-        case REQUEST_CODE_USER:
-            final int actionId = data.getExtras().getInt(Extra.ACTION);
-            final String nickname = data.getExtras().getString(Extra.USER);
-            final IRCConnection connection = binder.getService().getConnection(server.getId());
-            final String conversation = server.getSelectedConversation();
+                ((EditText) findViewById(R.id.input)).setText(buffer.toString().trim());
+                break;
+            case REQUEST_CODE_JOIN:
+                joinChannelBuffer = data.getExtras().getString("channel");
+                break;
+            case REQUEST_CODE_USERS:
+                Intent intent = new Intent(this, UserActivity.class);
+                intent.putExtra(Extra.USER, data.getStringExtra(Extra.USER));
+                startActivityForResult(intent, REQUEST_CODE_USER);
+                break;
+            case REQUEST_CODE_NICK_COMPLETION:
+                EditText input = (EditText) findViewById(R.id.input);
+                String src        = data.getExtras().getString(Extra.USER);
+                int start        = input.getSelectionStart();
+                int end        = input.getSelectionEnd();
 
-            // XXX: Implement me - The action should be handled after onResume()
-            //                     to catch the broadcasts... now we just wait a second
-            // Yes .. that's very ugly - we need some kind of queue that is handled after onResume()
-
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        // Do nothing
-                    }
-
-                    switch (actionId) {
-                    case R.id.op:
-                        connection.op(conversation, nickname);
-                        break;
-                    case R.id.deop:
-                        connection.deOp(conversation, nickname);
-                        break;
-                    case R.id.voice:
-                        connection.voice(conversation, nickname);
-                        break;
-                    case R.id.devoice:
-                        connection.deVoice(conversation, nickname);
-                        break;
-                    case R.id.kick:
-                        connection.kick(conversation, nickname);
-                        break;
-                    case R.id.ban:
-                        connection.ban(conversation, nickname + "!*@*");
-                        break;
-                    }
+                if (start == 0) {
+                    src += ":";
                 }
-            }.start();
 
-            break;
+                src += " ";
+                input.getText().replace(start, end, src, 0, src.length());
+                // put cursor after inserted text
+                input.setSelection(start + src.length());
+                input.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // make the softkeyboard come up again (only if no hw keyboard is attached)
+                        EditText input = (EditText) findViewById(R.id.input);
+                        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        mgr.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                });
+                input.requestFocus();
+                break;
+            case REQUEST_CODE_USER:
+                final int actionId = data.getExtras().getInt(Extra.ACTION);
+                final String nickname = data.getExtras().getString(Extra.USER);
+                final IRCConnection connection = binder.getService().getConnection(server.getId());
+                final String conversation = server.getSelectedConversation();
+
+                // XXX: Implement me - The action should be handled after onResume()
+                //                     to catch the broadcasts... now we just wait a second
+                // Yes .. that's very ugly - we need some kind of queue that is handled after onResume()
+
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            // Do nothing
+                        }
+
+                        switch (actionId) {
+                            case R.id.op:
+                                connection.op(conversation, nickname);
+                                break;
+                            case R.id.deop:
+                                connection.deOp(conversation, nickname);
+                                break;
+                            case R.id.voice:
+                                connection.voice(conversation, nickname);
+                                break;
+                            case R.id.devoice:
+                                connection.deVoice(conversation, nickname);
+                                break;
+                            case R.id.kick:
+                                connection.kick(conversation, nickname);
+                                break;
+                            case R.id.ban:
+                                connection.ban(conversation, nickname + "!*@*");
+                                break;
+                        }
+                    }
+                }.start();
+
+                break;
         }
     }
 }
