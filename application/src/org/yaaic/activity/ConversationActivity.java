@@ -70,8 +70,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnKeyListener;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -261,6 +261,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On service connected
      */
+    @Override
     public void onServiceConnected(ComponentName name, IBinder service)
     {
         this.binder = (IRCBinder) service;
@@ -275,6 +276,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On service disconnected
      */
+    @Override
     public void onServiceDisconnected(ComponentName name)
     {
         this.binder = null;
@@ -371,6 +373,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On conversation message
      */
+    @Override
     public void onConversationMessage(String target)
     {
         Conversation conversation = server.getConversation(target);
@@ -401,6 +404,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On new conversation
      */
+    @Override
     public void onNewConversation(String target)
     {
         deckAdapter.addItem(server.getConversation(target));
@@ -414,6 +418,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On conversation remove
      */
+    @Override
     public void onRemoveConversation(String target)
     {
         deckAdapter.removeItem(target);
@@ -428,6 +433,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On server status update
      */
+    @Override
     public void onStatusUpdate()
     {
         ((ImageView) findViewById(R.id.status)).setImageResource(server.getStatusIcon());
@@ -450,6 +456,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                 builder.setMessage(getResources().getString(R.string.reconnect_after_disconnect, server.getTitle()))
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int id) {
                         binder.getService().getConnection(server.getId()).setAutojoinChannels(
                             server.getCurrentChannelNames()
@@ -461,6 +468,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                     }
                 })
                 .setNegativeButton(getString(R.string.negative_button), new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -493,6 +501,7 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     /**
      * On key pressed (input line)
      */
+    @Override
     public boolean onKey(View view, int keyCode, KeyEvent event)
     {
         EditText input = (EditText) view;
