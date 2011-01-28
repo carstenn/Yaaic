@@ -115,6 +115,17 @@ public class FishKeys
         }
     }
 
+    public String deleteKey(String server, String conversation)
+    {
+        String result = null;
+        checkExternalStorageState();
+        if(exStorageAvailable && exStorageWriteable) {
+            result = (String) keys.remove(server + "." + conversation);
+        }
+
+        return result;
+    }
+
 
 
 }

@@ -33,6 +33,22 @@ along with Yaaic.  If not, see <http://www.gnu.org/licenses/>.
         android:title="@string/close"
         android:icon="@android:drawable/ic_menu_close_clear_cancel" />
     <item
+        android:id="@+id/fish_menu"
+        android:title="@string/fish_conversation_menu"
+        android:icon="@android:drawable/ic_menu_help" >
+        <menu>
+        	<item
+        		android:id="@+id/fish_add_key"
+        		android:title="@string/fish_conversation_menu_add" />
+        	<item
+        		android:id="@+id/fish_show_key"
+        		android:title="@string/fish_conversation_menu_show" />
+       		<item 
+       			android:id="@+id/fish_delete_key"
+       			android:title="@string/fish_conversation_menu_delete" />
+        </menu>
+    </item>
+    <item
         android:id="@+id/disconnect"
         android:title="@string/disconnect"
         android:icon="@android:drawable/ic_menu_revert" />

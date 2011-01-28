@@ -30,6 +30,7 @@ import org.yaaic.adapter.DeckAdapter;
 import org.yaaic.adapter.MessageListAdapter;
 import org.yaaic.command.CommandParser;
 import org.yaaic.fish.Fish;
+import org.yaaic.fish.FishKeys;
 import org.yaaic.irc.IRCBinder;
 import org.yaaic.irc.IRCConnection;
 import org.yaaic.irc.IRCService;
@@ -93,7 +94,8 @@ public class ConversationActivity extends Activity implements ServiceConnection,
     private static final int REQUEST_CODE_JOIN = 1;
     private static final int REQUEST_CODE_USERS = 2;
     private static final int REQUEST_CODE_USER = 3;
-    private static final int REQUEST_CODE_NICK_COMPLETION= 4;
+    private static final int REQUEST_CODE_NICK_COMPLETION = 4;
+    private static final int REQUEST_CODE_FISH_ADD = 5;
 
     private int serverId;
     private Server server;
@@ -353,6 +355,46 @@ public class ConversationActivity extends Activity implements ServiceConnection,
                     startActivityForResult(intent, REQUEST_CODE_USERS);
                 } else {
                     Toast.makeText(this, getResources().getString(R.string.only_usable_from_channel), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.fish_add_key:
+                Conversation conversationAddKey = deckAdapter.getItem(deck.getSelectedItemPosition());
+                int addKeyType = conversationAddKey.getType();
+                if(addKeyType == Conversation.TYPE_CHANNEL || addKeyType == Conversation.TYPE_QUERY) {
+                    Intent fishAddKeyActivity = new Intent(this, FishAddKeyActivity.class);
+                    fishAddKeyActivity.putExtra("server", server.getTitle());
+                    fishAddKeyActivity.putExtra("conversation", conversationAddKey.getName());
+                    startActivityForResult(fishAddKeyActivity, REQUEST_CODE_FISH_ADD);
+                } else {
+                    Toast.makeText(this, getResources().getString(R.string.only_usable_from_channel_or_query), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.fish_show_key:
+                Conversation conversationShowKey = deckAdapter.getItem(deck.getSelectedItemPosition());
+                int showKeyType = conversationShowKey.getType();
+                if(showKeyType == Conversation.TYPE_CHANNEL || showKeyType == Conversation.TYPE_QUERY) {
+                    String key = FishKeys.getInstance().getKey(server.getTitle(), conversationShowKey.getName());
+                    if(key != null) {
+                        Toast.makeText(this, getResources().getString(R.string.fish_toast_show) + " " + conversationShowKey.getName() + "\n" + key, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, conversationShowKey.getName() + " " + getResources().getString(R.string.fish_toast_show_none), Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, getResources().getString(R.string.only_usable_from_channel_or_query), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.fish_delete_key:
+                Conversation conversationDeleteKey = deckAdapter.getItem(deck.getSelectedItemPosition());
+                int deleteKeyType = conversationDeleteKey.getType();
+                if(deleteKeyType == Conversation.TYPE_CHANNEL || deleteKeyType == Conversation.TYPE_QUERY) {
+                    String result = FishKeys.getInstance().deleteKey(server.getTitle(), conversationDeleteKey.getName());
+                    if(result != null) {
+                        Toast.makeText(this, getResources().getString(R.string.fish_toast_delete) + " " + server.getTitle() + "." + conversationDeleteKey.getName(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, getResources().getString(R.string.fish_toast_show_none) + server.getTitle() + "." + conversationDeleteKey.getName(), Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(this, getResources().getString(R.string.only_usable_from_channel_or_query), Toast.LENGTH_SHORT).show();
                 }
                 break;
         }

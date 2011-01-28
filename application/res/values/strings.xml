@@ -192,4 +192,14 @@
     <string name="settings_voice_recognition_desc">Show button for voice recognition</string>
     <string name="settings_joinpart_title">Show join and part</string>
     <string name="settings_joinpart_desc">Show join and part messages in channels</string>
+    
+    <string name="fish_conversation_menu">Fish</string>
+    <string name="fish_conversation_menu_add">Add key</string>
+    <string name="fish_conversation_menu_show">Show key</string>
+    <string name="fish_conversation_menu_delete">Delete key</string>
+    <string name="fish_conversation_menu_add_bnt">Save key</string>
+    <string name="fish_toast_show">Fish key for</string>
+    <string name="fish_toast_show_none">has no key set!</string>
+    <string name="fish_toast_delete">Done!\n Removed key for</string>
+    <string name="fish_toast_delete_none">No key set for \n</string>
 </resources>
